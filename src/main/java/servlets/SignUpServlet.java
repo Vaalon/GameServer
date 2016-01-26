@@ -2,6 +2,7 @@ package servlets;
 
 import accounts.AccountService;
 import accounts.UserProfile;
+import dbService.executor.DBException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,7 +31,13 @@ public class SignUpServlet extends HttpServlet {
             return;
         }
 
-        UserProfile userProfile = accountService.getUserByLogin(login);
+        UserProfile userProfile = null;
+        try {
+            userProfile = accountService.getUserByLogin(login);
+        } catch (DBException e) {
+            //TODO: Заглушка. Как-нибудь обработать
+        }
+
         if (userProfile != null) {
             resp.setContentType("text/html;charset=utf-8");
             resp.getWriter().println("User with this login already exists");
@@ -38,7 +45,14 @@ public class SignUpServlet extends HttpServlet {
             return;
         }
 
-        accountService.addNewUser(new UserProfile(login, password, "temp@gmail.com"));
+        try {
+            accountService.addNewUser(new UserProfile(login, password, "temp@gmail.com"));
+        } catch (DBException e) {
+            resp.setContentType("text/html;charset=utf-8");
+            resp.getWriter().println(e.toString());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
         resp.setContentType("text/html;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
     }

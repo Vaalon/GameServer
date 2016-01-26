@@ -4,6 +4,7 @@
 package main;
 
 import accounts.AccountService;
+import dbService.executor.DBService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -15,7 +16,8 @@ import servlets.SingInServlet;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        AccountService accountService = new AccountService();
+        DBService dbService = new DBService();
+        AccountService accountService = new AccountService(dbService);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.addServlet(new ServletHolder(new SignUpServlet(accountService)), "/signup");

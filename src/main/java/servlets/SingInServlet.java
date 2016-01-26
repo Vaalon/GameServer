@@ -2,6 +2,7 @@ package servlets;
 
 import accounts.AccountService;
 import accounts.UserProfile;
+import dbService.executor.DBException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,7 +31,13 @@ public class SingInServlet extends HttpServlet {
             return;
         }
 
-        UserProfile userProfile = accountService.getUserByLogin(login);
+        UserProfile userProfile = null;
+        try {
+            userProfile = accountService.getUserByLogin(login);
+        } catch (DBException e) {
+            //TODO: Заглушка. Как-нибудь обработать
+        }
+
         if (userProfile == null || !userProfile.getPass().equals(password)) {
             resp.setContentType("text/html;charset=utf-8");
             resp.getWriter().println("Unauthorized");
@@ -39,7 +46,7 @@ public class SingInServlet extends HttpServlet {
         }
 
         resp.setContentType("text/html;charset=utf-8");
-        resp.getWriter().println("Authorized");
+        resp.getWriter().println("Authorized: " + login);
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 }
